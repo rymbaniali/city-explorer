@@ -12,7 +12,8 @@ class App extends React.Component {
     this.state = {
       cityName: '',
       displayImg: false,
-      cityData: {}
+      cityData: {},
+      message: false
     }
   }
   updateCityState = (event) => {
@@ -24,49 +25,66 @@ class App extends React.Component {
 
   getData = async (event) => {
     event.preventDefault();
-    const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.dbbabf7a550415333e7fb0e19d34c057&city=${this.state.cityName}&format=json`);
-    console.log(axiosResponse);
+    try {
+      const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.dbbabf7a550415333e7fb0e19d34c057&city=${this.state.cityName}&format=json`);
+      console.log(axiosResponse);
 
-    this.setState({
-      cityData: axiosResponse.data[0],
-      displayImg: true,
+      this.setState({
+        cityData: axiosResponse.data[0],
+        displayImg: true,
 
-    })
-    
+      });
+    } catch {
+      this.setState({
+        displayImg: false,
+        message: true,
+      });
+
+    };
   };
- 
   render() {
     return (
       <div>
         <h1>City Explorer</h1>
-        <Form >
+
+
+
+        {/* <Form >
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>City name</Form.Label>
             <Form.Control onChange={this.updateCityState} type="text" placeholder="Enter City Name" />
-          </Form.Group>
-          <input onSubmit={this.getData} variant="primary" type="submit" />
-      
-        
-        </Form>
-
-        {this.state.displayData &&
-          <div>
-            <p>
-              {this.state.cityData.display_name}
-            </p>
-
-            <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.dbbabf7a550415333e7fb0e19d34c057&q&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=15`} alt='mapImg' />
+          </Form.Group>{{
+          <Button onSubmit={this.getData}  type="submit" >
+            submit
+          </Button>
+</Form >
+     */}
 
 
-          </div>
+        <form onSubmit={this.getData}>
+          <label>
+            cityName
+          </label>
+          <input onChange={this.updateCityState} type='text' />
+          <input type="submit" />
+        </form>
+        <p>{this.state.cityData.display_name}</p>
+        {this.state.displayImg &&
+
+          <img
+            src={`https://maps.locationiq.com/v3/staticmap?key=pk.dbbabf7a550415333e7fb0e19d34c057&center=${this.state.cityData.lat},${this.state.cityData.lon}`}
+            alt={this.state.cityData.display_name}
+          />
+        }
+
+
+        {this.state.errorMessage &&
+          <p>Data Error</p>
         }
       </div>
-
-
-
     )
   };
-};
 
+}
 
 export default App;
