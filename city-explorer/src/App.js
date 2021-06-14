@@ -1,8 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+// import Form from 'react-bootstrap/Form';
+// import Button from 'react-bootstrap/Button';
 
 
 class App extends React.Component {
@@ -13,7 +13,8 @@ class App extends React.Component {
       cityName: '',
       displayImg: false,
       cityData: {},
-      message: false
+      message: false,
+      weatherData: '',
     }
   }
   updateCityState = (event) => {
@@ -29,9 +30,12 @@ class App extends React.Component {
       const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.dbbabf7a550415333e7fb0e19d34c057&city=${this.state.cityName}&format=json`);
       console.log(axiosResponse);
 
+      const myApiRes = await axios.get(`${process.env.REACT_APP_URL}/weather-data`);
+
       this.setState({
         cityData: axiosResponse.data[0],
         displayImg: true,
+        weatherData: myApiRes.data.data,
 
       });
     } catch {
