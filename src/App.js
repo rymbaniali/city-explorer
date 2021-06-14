@@ -85,6 +85,17 @@ class App extends React.Component {
         {this.state.errorMessage &&
           <p>Data Error</p>
         }
+
+        {
+          this.state.weatherData.map(value => {
+            return (
+              <p>
+                {value.data.description}
+              </p>
+            )
+          })
+        }
+
       </div>
     )
   };
