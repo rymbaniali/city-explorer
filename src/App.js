@@ -1,105 +1,91 @@
-import React from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-// import Form from 'react-bootstrap/Form';
-// import Button from 'react-bootstrap/Button';
 
-
-class App extends React.Component {
-
+export class App extends Component {
+ 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       cityName: '',
-      displayImg: false,
       cityData: {},
-      message: false,
+      lat: '',
+      lon: '',
       weatherData: '',
+      displayData: false,
     }
-  }
-  updateCityState = (event) => {
+  };
+
+  updateCityNameState = (event) => {
+    
     this.setState({
-      cityName: event.target.value,
-
+      cityName: event.target.value
     });
-  };
 
-  getData = async (event) => {
+  }
+
+  getCityData = async (event) => {
     event.preventDefault();
-    try {
-      const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.dbbabf7a550415333e7fb0e19d34c057&city=${this.state.cityName}&format=json`);
-      console.log(axiosResponse);
-
-      const myApiRes = await axios.get(`${process.env.REACT_APP_URL}/weather-data`);
+    await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.dbbabf7a550415333e7fb0e19d34c057&city=${this.state.cityName}&format=json`).then(locationResponse => {
 
       this.setState({
-        cityData: axiosResponse.data[0],
-        displayImg: true,
-        weatherData: myApiRes.data.data,
+        cityData: locationResponse.data[0],
+        lat: locationResponse.data[0].lat,
+        lon: locationResponse.data[0].lon,
+      });
+      axios.get(`${process.env.REACT_APP_URL}/weather?lat=${this.state.lat}&lon=${this.state.lon}`).then(weatherResponse => {
+        this.setState({
+          weatherData: weatherResponse.data,
+          displayData: true
+        })
 
       });
-    } catch {
-      this.setState({
-        displayImg: false,
-        message: true,
-      });
+    });
 
-    };
-  };
+  }
+
   render() {
     return (
       <div>
         <h1>City Explorer</h1>
-
-
-
-        {/* <Form >
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>City name</Form.Label>
-            <Form.Control onChange={this.updateCityState} type="text" placeholder="Enter City Name" />
-          </Form.Group>{{
-          <Button onSubmit={this.getData}  type="submit" >
-            submit
-          </Button>
-</Form >
-     */}
-
-
-        <form onSubmit={this.getData}>
+        <form onSubmit={this.getCityData}>
           <label>
-            cityName
+            City Name:
           </label>
-          <input onChange={this.updateCityState} type='text' />
-          <input type="submit" />
+          <input onChange={this.updateCityNameState} type="text" />
+          <br></br>
+          <br></br>
+          <input type="submit" value="get City" />
         </form>
-        <p>{this.state.cityData.display_name}</p>
-        {this.state.displayImg &&
+    
+        {this.state.displayData &&
+          <div>
 
-          <img
-            src={`https://maps.locationiq.com/v3/staticmap?key=pk.dbbabf7a550415333e7fb0e19d34c057&center=${this.state.cityData.lat},${this.state.cityData.lon}`}
-            alt={this.state.cityData.display_name}
-          />
+            <p>
+              {this.state.cityData.display_name}
+            </p>
+
+            <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.dbbabf7a550415333e7fb0e19d34c057&q&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=15`} alt='' />
+
+            {
+              this.state.weatherData.map(weatherObj => {
+                return (
+                  <>
+                    <p>
+                      {weatherObj.description}
+                    </p>
+                    <p>
+                      {weatherObj.date}
+                    </p>
+                  </>
+                )
+              })
+            }
+
+          </div>
         }
-
-
-        {this.state.errorMessage &&
-          <p>Data Error</p>
-        }
-
-        {
-          this.state.weatherData.map(value => {
-            return (
-              <p>
-                {value.data.description}
-              </p>
-            )
-          })
-        }
-
       </div>
     )
-  };
-
+  }
 }
 
 export default App;
