@@ -10,7 +10,7 @@ export class App extends Component {
       cityData: {},
       lat: '',
       lon: '',
-      weatherData: '',
+      weatherData: [],
       displayData: false,
     }
   };
