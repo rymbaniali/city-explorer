@@ -25,7 +25,7 @@ export class App extends Component {
 
   getCityData = async (event) => {
     event.preventDefault();
-    await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.dbbabf7a550415333e7fb0e19d34c057&city=${this.state.cityName}&format=json`).then(locationResponse => {
+    await axios.get(`https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_MY_API}&city=${this.state.cityName}&format=json`).then(locationResponse => {
 
       this.setState({
         cityData: locationResponse.data[0],
